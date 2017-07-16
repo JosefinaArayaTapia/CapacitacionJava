@@ -1,45 +1,63 @@
 package com.josefina.servlets;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+
+import com.josefina.dao.LoginDaoImpl;
+import java.io.IOException;
+
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@WebServlet(name = "Login", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		String user = req.getParameter("user");
-		String pass = req.getParameter("password");
-		if ("admin".equals(user) && "admin".equals(pass)) {
-			response(resp, "Login Ok");
-		} else {
-			response(resp, "Login Invalido");
-		}
-	}
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        System.out.println("Llega al DoPost");
 
-		String user = req.getParameter("user");
-		String pass = req.getParameter("password");
-		if ("admin".equals(user) && "admin".equals(pass)) {
-			response(resp, "Login Ok");
-		} else {
-			response(resp, "Login Invalido");
-		}
-	}
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
 
-	private void response(HttpServletResponse resp, String msg)
-			throws IOException {
-		PrintWriter out = resp.getWriter();
-		out.println("<html>");
-		out.println("<body>");
-		out.println("<h1>" + msg + "</h1>");
-		out.println("</body>");
-		out.println("</html>");
-	}
+
+        //si el formulario falla
+        if (email.isEmpty() || password.isEmpty())
+        {
+            req.setAttribute("error", "Usuario y password no pueden ir vacíos");
+            RequestDispatcher rs = req.getRequestDispatcher("/login.jsp");
+            rs.forward(req, resp);
+        }
+        else
+        {
+            //si el formulario pasa la validación
+
+            //creamos la instancia de LoginDaoImp
+            LoginDaoImpl loginDaoImpl = new LoginDaoImpl();
+            System.out.println("Llega al login");
+            //por defecto el resultado del login es false
+            boolean res = false;
+            try
+            {
+                res = loginDaoImpl.authenticate(email, password);
+
+                if(res)
+                {
+                    System.out.println("Login correcto");
+                }
+                else
+                {
+                    System.out.println("Login incorrecto");
+                }
+            }
+            catch (Exception ex)
+            {
+                //Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+
 }
