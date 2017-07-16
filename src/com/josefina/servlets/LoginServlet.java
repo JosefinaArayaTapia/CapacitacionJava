@@ -23,6 +23,7 @@ public class LoginServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+
 		String user = req.getParameter("user");
 		String pass = req.getParameter("password");
 		if ("admin".equals(user) && "admin".equals(pass)) {
